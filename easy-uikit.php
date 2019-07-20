@@ -3,14 +3,14 @@
  Plugin Name: Easy UIkit
  Plugin URI: https://www.beaverplugins.com/docs/easy-uikit/
  Description: Easy UIKit adds the UIkit3 library to the queue so you can use it even when changing themes. Current version is 3.1.4.
- Version: 1.3.0
+ Version: 1.3.1
  Author: Didou Schol
  Text Domain: easy-uikit
  Domain Path: /languages
  Author URI: https://www.badabing.nl
  */
 
-define( 'EASYUIKIT_VERSION' 	, '1.3.0' );
+define( 'EASYUIKIT_VERSION' 	, '1.3.1' );
 define( 'EASYUIKIT_DIR'			, plugin_dir_path( __FILE__ ) );
 define( 'EASYUIKIT_FILE'		, __FILE__ );
 define( 'EASYUIKIT_URL' 		, plugins_url( '/', __FILE__ ) );
@@ -39,7 +39,7 @@ $updater->set_username( 'badabingbreda' );
 $updater->set_repository( 'easy-uikit' );
 $updater->set_settings( array(
 			'requires'			=> '4.6',
-			'tested'			=> '5.2.1',
+			'tested'			=> '5.2.2',
 			'rating'			=> '100.0',
 			'num_ratings'		=> '10',
 			'downloaded'		=> '10',

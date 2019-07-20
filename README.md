@@ -15,6 +15,9 @@ Current version is v3.1.6
 
 #### changelog:
 
+**1.3.1** (July 20th, 2019)
+Minor update for SVG borders not handling well in Beaver Builder
+
 **1.3.0** (July 20th, 2019)
 
 Updated to version 3.1.6
