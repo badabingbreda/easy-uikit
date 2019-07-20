@@ -116,7 +116,9 @@ class github_updater {
 	        }
 	        // Set it to our property
 	        $this->github_response = $response;
+	        return $response;
 	    }
+
 	}
 
 	/**
@@ -137,10 +139,13 @@ class github_updater {
 	public function modify_transient( $transient ) {
 
 		// Check if transient has a checked property
-		if( property_exists( $transient, 'checked') ) {
+		if ( property_exists( $transient, 'checked') ) {
 
 		 	// Did Wordpress check for updates?
-			if( $checked = $transient->checked ) {
+			if ( $checked = $transient->checked ) {
+
+				// return early if our plugin hasn't been checked
+				if( !isset( $checked[ $this->basename ] ) ) return $transient;
 
 				// Get the repo info
 				$this->get_repository_info();

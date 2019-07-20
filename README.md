@@ -11,9 +11,16 @@ Easy UIKit adds the UIkit3 library to the queue so you can use it even when chan
 More info on UIKit here: [https://getuikit.com](https://getuikit.com/docs/introduction)
 
 ####current UIkit version
-Current version is v3.1.4
+Current version is v3.1.6
 
 #### changelog:
+
+**1.3.0** (July 20th, 2019)
+
+Updated to version 3.1.6
+Removed re-styling of base html-tags
+Updated Github Updater Class to fix error-notices
+
 
 **1.2.0** (May 14th, 2019)
 
