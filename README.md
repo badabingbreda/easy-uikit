@@ -15,6 +15,10 @@ Current version is v3.1.6
 
 #### changelog:
 
+**1.3.2** (July 30th, 2019)
+Fixed to show correct UIkit version (3.1.6) in plugin's description
+Removed CSS font-family style from uk-h1 through uk-h6, uk-heading-*
+
 **1.3.1** (July 20th, 2019)
 Minor update for SVG borders not handling well in Beaver Builder
 
