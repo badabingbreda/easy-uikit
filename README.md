@@ -11,9 +11,15 @@ Easy UIKit adds the UIkit3 library to the queue so you can use it even when chan
 More info on UIKit here: [https://getuikit.com](https://getuikit.com/docs/introduction)
 
 ####current UIkit version
-Current version is v3.1.6
+Current version is v3.2.2
 
 #### changelog:
+
+**v.1.4.0** (November 25th, 2019)
+Updated UIkit to version 3.2.2.
+Added extra CSS-styling in components/lightbox.less to fix close button moving away on hover.
+Tweaked svg positioning; reset .fl-builder-edit svg {} to initial so that the interface aligns correctly.
+Added .fl-row svg {} to prevent fit-height from going wild.
 
 **1.3.2** (July 30th, 2019)
 Fixed to show correct UIkit version (3.1.6) in plugin's description
