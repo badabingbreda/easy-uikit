@@ -2,15 +2,15 @@
 /**
  Plugin Name: Easy UIkit
  Plugin URI: https://www.beaverplugins.com/docs/easy-uikit/
- Description: Easy UIKit adds the UIkit3 library to the queue so you can use it even when changing themes. Current UIkit version is 3.1.6.
- Version: 1.4.0
+ Description: Easy UIKit adds the UIkit3 library to the queue so you can use it even when changing themes. Flex classes are tweaked to work with Beaver Builder Columns. Current UIkit version is 3.2.2.
+ Version: 1.4.1
  Author: Didou Schol
  Text Domain: easy-uikit
  Domain Path: /languages
  Author URI: https://www.badabing.nl
  */
 
-define( 'EASYUIKIT_VERSION' 	, '1.4.0' );
+define( 'EASYUIKIT_VERSION' 	, '1.4.1' );
 define( 'EASYUIKIT_DIR'			, plugin_dir_path( __FILE__ ) );
 define( 'EASYUIKIT_FILE'		, __FILE__ );
 define( 'EASYUIKIT_URL' 		, plugins_url( '/', __FILE__ ) );
