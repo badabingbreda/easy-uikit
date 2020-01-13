@@ -20,6 +20,12 @@ Current version is v3.2.2
 
 #### changelog:
 
+**v.1.4.3** (January 13th, 2020)
+Fixed URL path for enqueued js and css files
+
+**v.1.4.2** (December 11th, 2019)
+Removed resetting svg height, seemed to still interfere with row-shapes.
+
 **v.1.4.1** (December 5th, 2019)
 Fixed row background-shapes and UABB row-effect not showing the SVG shapes correctly.
 
