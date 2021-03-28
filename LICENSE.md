@@ -1,4 +1,4 @@
-Copyright (c) 2015-2019 Badabing, www.badabing.nl
+Copyright (c) 2015-2021 Badabing, www.badabing.nl
 
 https://github.com/uikit/uikit/blob/develop/LICENSE.md
 

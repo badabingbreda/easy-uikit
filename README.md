@@ -1,24 +1,69 @@
 
-Easy UIkit
-===
+# Easy UIkit
+
 
 Easy UIkit is a WordPress plugin that enqueues the UIkit3 library so that it can be used regardless of which theme you're using.
 
-###Plugin Description
+## Plugin Description
 
-Easy UIKit adds the UIkit3 library to the queue so you can use it even when changing themes. Great for page builders plugins like Beaver Builder. It also includes AlekVolsk's width-ex for extended column support (up to 30 columns).
+Easy UIKit adds the UIkit3 library to the asset queue so you can use it even when changing themes. Great for page builders plugins like Beaver Builder. It also includes AlekVolsk's width-ex for extended column support (up to 30 columns).
 
-###Beaver Builder update
-Since version 1.4.0 you can also use flexbox inside Beaver Builder Columns. Currently support for uk-child-width-1-x is up to 6 columns, however, individual modules may use any supported uk-width-1-x that is supported.
+The CSS and scripts are also loaded on the dashboard, so that you can use them in the Gutenberg Editor as well. Ideal for your occasional blocks development using popular block frameworks like ACF Pro or Meta Box.
 
-Row background shapes (SVG's) and Row Shape Effects (UABB addon) have been improved and are working as expected.
+---
+
+## Disabling Backend CSS
+
+
+If you do not need them loaded on the backend, you can dequeue the action:
+
+`
+    remove_action( 'admin_enqueue_scripts', 'easy_uikit_admin_enqueue', 100, 1 );
+`
+
+or by adding a constant
+
+`
+    define( 'EASYUIKIT_ADMIN_ENQUEUE' , false );
+`
+
+---
+## More info
 
 More info on UIKit here: [https://getuikit.com](https://getuikit.com/docs/introduction)
 
-####current UIkit version
-Current version is v3.2.2
+UIkit-ex [Thanks AlekVolsk](https://github.com/master3-blank-template/UIkit-Ex)
 
-#### changelog:
+---
+
+## Beaver Builder Flex Modules
+Since version 1.4.0 you can also use flexbox inside Beaver Builder Columns. Currently support for uk-child-width-1-x is up to 6 columns, however, individual modules may use any supported uk-width-1-x that is supported.
+
+
+|Column class|Module class |
+|--|--|
+|uk-flex  |uk-flex-1  |
+| | uk-flex-none
+| | uk-flex-auto
+
+
+### **SVG Background shapes**
+
+Row background shapes (SVG's) and Row Shape Effects (UABB addon) have been improved and are working as expected.
+
+---
+## Current UIkit version
+Current version is v3.6.18
+
+---
+
+## CHANGELOG
+
+**v.1.6.0** 
+Updated to UIkit 3.6.18, removed Base theme settings (font settings for uk-h1 etcetera). Reduced supported columns to 12, uncompressed CSS file reduced 30% in size.
+
+**v.1.5.0** 
+Updated to UIkit 3.5.4
 
 **v.1.4.3** (January 13th, 2020)
 Fixed URL path for enqueued js and css files
