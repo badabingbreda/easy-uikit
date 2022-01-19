@@ -53,11 +53,14 @@ Row background shapes (SVG's) and Row Shape Effects (UABB addon) have been impro
 
 ---
 ## Current UIkit version
-Current version is v3.6.18
+Current version is v3.10.1 ( released Jan 19th, 2022 )
 
 ---
 
 ## CHANGELOG
+
+**v.1.7.0** 
+Updated to UIkit 3.10.1.
 
 **v.1.6.0** 
 Updated to UIkit 3.6.18, removed Base theme settings (font settings for uk-h1 etcetera). Reduced supported columns to 12, uncompressed CSS file reduced 30% in size.
