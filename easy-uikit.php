@@ -9,8 +9,8 @@
   * @wordpress-plugin
   * Plugin Name: Easy UIkit
   * Plugin URI:  https://www.beaverplugins.com/docs/easy-uikit/
-  * Description: Easy UIKit adds the UIkit3 library (v 3.10.0) Flex classes are tweaked to work with Beaver Builder Columns. Also adds AlexVolsk uk-width-ex and uk-grid-ex for extra column support (12 columns)
-  * Version:     1.7.0
+  * Description: Easy UIKit adds the UIkit3 library (v 3.11.1) Flex classes are tweaked to work with Beaver Builder Columns. Also adds AlexVolsk uk-width-ex and uk-grid-ex for extra column support (12 columns)
+  * Version:     1.8.0
   * Author:      Badabingbreda
   * Author URI:  https://www.badabing.nl
   * Text Domain: easy-uikit
@@ -20,7 +20,7 @@
   */
  
 
-define( 'EASYUIKIT_VERSION' 	, '1.7.0' );
+define( 'EASYUIKIT_VERSION' 	, '1.8.0' );
 define( 'EASYUIKIT_DIR'			, plugin_dir_path( __FILE__ ) );
 define( 'EASYUIKIT_FILE'		, __FILE__ );
 define( 'EASYUIKIT_URL' 		, plugins_url( '/', __FILE__ ) );
@@ -63,7 +63,7 @@ $updater->set_username( 'badabingbreda' );
 $updater->set_repository( 'easy-uikit' );
 $updater->set_settings( array(
 			'requires'			=> '5.1',
-			'tested'			=> '5.8.3',
+			'tested'			=> '5.9.0',
 			'rating'			=> '100.0',
 			'num_ratings'		=> '10',
 			'downloaded'		=> '10',

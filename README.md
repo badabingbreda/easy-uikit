@@ -59,6 +59,9 @@ Current version is v3.10.1 ( released Jan 19th, 2022 )
 
 ## CHANGELOG
 
+**v.1.8.0** 
+Updated to UIkit 3.11.1.
+
 **v.1.7.0** 
 Updated to UIkit 3.10.1.
 
