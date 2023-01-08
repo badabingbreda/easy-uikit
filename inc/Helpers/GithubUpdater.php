@@ -3,6 +3,15 @@ namespace EasyUIkit\Helpers;
 /**
  * Github updater
  *
+ * @example Github release body:
+ * 	Tested: 6.1.1
+ *	Icons: 1x|https://domainname.com/icon-256x256.png?rev=2818463,2x|https://domainname.com/icon-256x256.png?rev=2818463
+ *  Banners: 1x|https://domainname.com/banner-720x250.png
+ *	RequiredPHP: 7.0
+ *
+ *	|||
+ *	Updated to UIkit version 3.11.1
+ * 
  * @since  1.1.1
  *
  */
@@ -114,6 +123,13 @@ class GithubUpdater {
 	        	// Update our zip url with token
 	            $response['zipball_url'] = add_query_arg( 'access_token', $this->authorize_token, $response['zipball_url'] );
 	        }
+
+			// try to get metadata from the release body
+			$metadata = $this->get_tmpfile_data( $response['body']);
+
+			// merge the data with the response
+			$response = array_merge( $response, $metadata);
+
 	        // Set it to our property
 	        $this->github_response = $response;
 	        return $response;
@@ -160,17 +176,18 @@ class GithubUpdater {
 					// Create valid slug
 					$slug = current( explode('/', $this->basename ) );
 
-					// try to get metadata from the release body
-					$metadata = $this->get_tmpfile_data( $this->github_response['body']);
+					// // try to get metadata from the release body
+					// $metadata = $this->get_tmpfile_data( $this->github_response['body']);
 
 					// setup our plugin info
 					$plugin = array(
 						'url' => $this->plugin["PluginURI"],
 						'slug' => $slug,
 						'package' => $new_files,
-						'tested' => $metadata['tested'],
-						'icons' => $metadata[ 'icons' ],
-						'new_version' => $this->github_response['tag_name']
+						'tested' => $this->github_response['tested'],
+						'icons' => $this->github_response['icons'],
+						'banner' => $this->github_response['banners'],
+						'new_version' => $this->github_response['tag_name'],
 					);
 
 					// Return it in response
@@ -203,12 +220,15 @@ class GithubUpdater {
             [
                 'tested' => 'Tested',
 				'icons' => 'Icons',
+				'banners' => 'Banners',
 				'required_php' => 'RequiredPHP',
             ]
         );
 
 		$icons = $file_headers[ 'icons' ] ? array_map( 'trim', explode(',', $file_headers[ 'icons' ] ) ) : false;
+		$banners = $file_headers[ 'banners' ] ? array_map( 'trim', explode(',', $file_headers[ 'banners' ] ) ) : false;
 
+		// decompose the icons, if provided
 		if (is_array($icons)) {
 			$icons = array_reduce( $icons, function ($acc , $item) { 
 				$ex_item = explode('|', $item);
@@ -217,12 +237,26 @@ class GithubUpdater {
 			} , []);
 		}
 
+		// decompose the banners, if provided
+		if (is_array($banners)) {
+			$banners = array_reduce( $banners, function ($acc , $item) { 
+				$ex_item = explode('|', $item);
+				$acc[$ex_item[0]] = $ex_item[1];
+				return $acc;
+			} , []);
+		}
+
+		// try to find the update_description delimiter
+		$update_description = explode( '|||' , $string );
+
+		$updates = ( sizeof($update_description) == 2 ) ? $update_description[1] : '';
+
 		$data = [
             'tested' => $file_headers[ 'tested' ],
             'required_php' => $file_headers[ 'required_php' ],
             'icons' => $icons,
-			'string' => $string_as_array,
-			'tmpfilename' => $tmpfilename,
+            'banners' => $banners,
+			'updates' => $updates,
         ];
 
 		// close our temp file again
@@ -264,7 +298,7 @@ class GithubUpdater {
 					'short_description' => $this->plugin["Description"],
 					'sections'			=> array(
 						'Description'	=> $this->plugin["Description"],
-						'Updates'		=> $this->github_response['body'],
+						'Updates'		=> $this->github_response['updates'],
 					),
 					'download_link'		=> $this->github_response['zipball_url']
 				);
