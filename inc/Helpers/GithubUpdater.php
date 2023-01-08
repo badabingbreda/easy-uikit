@@ -69,6 +69,7 @@ class GithubUpdater {
 			'num_ratings'		=> '10',
 			'downloaded'		=> '10',
 			'added'				=> '2019-04-06',
+			'banners'			=> false,
 		);
 
 		$settings = wp_parse_args( $settings , $defaults );
@@ -184,6 +185,7 @@ class GithubUpdater {
 						'tested' => $this->github_response['tested'],
 						'icons' => $this->github_response['icons'],
 						'banners' => $this->github_response['banners'],
+						'banners_rtl' => [],
 						'requires_php' => $this->github_response['requires_php'],
 						'new_version' => $this->github_response['tag_name'],
 					);
@@ -193,6 +195,7 @@ class GithubUpdater {
 				}
 			}
 		}
+		
 		// Return filtered transient
 		return $transient;
 	}
@@ -225,20 +228,23 @@ class GithubUpdater {
 		$icons = $file_headers[ 'icons' ] ? array_map( 'trim', explode(',', $file_headers[ 'icons' ] ) ) : false;
 		$banners = $file_headers[ 'banners' ] ? array_map( 'trim', explode(',', $file_headers[ 'banners' ] ) ) : false;
 
+		$username = $this->username;
+		$repository = $this->repository;
+
 		// decompose the icons, if provided
 		if (is_array($icons)) {
-			$icons = array_reduce( $icons, function ($acc , $item) { 
+			$icons = array_reduce( $icons, function ($acc , $item) use ($username,$repository) { 
 				$ex_item = explode('|', $item);
-				$acc[$ex_item[0]] = $ex_item[1];
+				$acc[$ex_item[0]] = sprintf("https://github.com/%s/%s" , $username, $repository ) . $ex_item[1];
 				return $acc;
 			} , []);
 		}
 
 		// decompose the banners, if provided
 		if (is_array($banners)) {
-			$banners = array_reduce( $banners, function ($acc , $item) { 
+			$banners = array_reduce( $banners, function ($acc , $item) use ($username,$repository) { 
 				$ex_item = explode('|', $item);
-				$acc[$ex_item[0]] = $ex_item[1];
+				$acc[$ex_item[0]] = sprintf("https://github.com/%s/%s" , $username, $repository ) . $ex_item[1];
 				return $acc;
 			} , []);
 		}
@@ -297,6 +303,7 @@ class GithubUpdater {
 						'Description'	=> $this->plugin["Description"],
 						'Updates'		=> $this->github_response['updates'],
 					),
+					'banners'			=> $this->github_response[ 'banners' ],
 					'download_link'		=> $this->github_response['zipball_url']
 				);
 
@@ -307,7 +314,6 @@ class GithubUpdater {
 				return (object) $plugin;
 			}
 		}
-
 		// Otherwise return default
 		return $result;
 	}
