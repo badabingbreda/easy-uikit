@@ -7,7 +7,7 @@ namespace EasyUIkit\Helpers;
  * 	Tested: 6.1.1
  *	Icons: 1x|https://domainname.com/icon-256x256.png?rev=2818463,2x|https://domainname.com/icon-256x256.png?rev=2818463
  *  Banners: 1x|https://domainname.com/banner-720x250.png
- *	RequiredPHP: 7.0
+ *	RequiresPHP: 7.0
  *
  *	|||
  *	Updated to UIkit version 3.11.1
@@ -176,9 +176,6 @@ class GithubUpdater {
 					// Create valid slug
 					$slug = current( explode('/', $this->basename ) );
 
-					// // try to get metadata from the release body
-					// $metadata = $this->get_tmpfile_data( $this->github_response['body']);
-
 					// setup our plugin info
 					$plugin = array(
 						'url' => $this->plugin["PluginURI"],
@@ -186,7 +183,8 @@ class GithubUpdater {
 						'package' => $new_files,
 						'tested' => $this->github_response['tested'],
 						'icons' => $this->github_response['icons'],
-						'banner' => $this->github_response['banners'],
+						'banners' => $this->github_response['banners'],
+						'requires_php' => $this->github_response['requires_php'],
 						'new_version' => $this->github_response['tag_name'],
 					);
 
@@ -195,7 +193,6 @@ class GithubUpdater {
 				}
 			}
 		}
-
 		// Return filtered transient
 		return $transient;
 	}
@@ -221,7 +218,7 @@ class GithubUpdater {
                 'tested' => 'Tested',
 				'icons' => 'Icons',
 				'banners' => 'Banners',
-				'required_php' => 'RequiredPHP',
+				'requires_php' => 'RequiresPHP',
             ]
         );
 
@@ -253,7 +250,7 @@ class GithubUpdater {
 
 		$data = [
             'tested' => $file_headers[ 'tested' ],
-            'required_php' => $file_headers[ 'required_php' ],
+            'requires_php' => $file_headers[ 'requires_php' ],
             'icons' => $icons,
             'banners' => $banners,
 			'updates' => $updates,
