@@ -59,6 +59,11 @@ Current version is v3.11.1 ( released Feb 7th, 2022 )
 
 ## CHANGELOG
 
+**v.2.0.0**
+Updated to UIkit 3.15.19.
+Updated plugin to autoloader
+Made changes to GithubUpdater to allow for tested check, icons and banners
+
 **v.1.8.0** 
 Updated to UIkit 3.11.1.
 

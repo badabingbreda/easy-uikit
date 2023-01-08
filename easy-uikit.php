@@ -9,8 +9,8 @@
   * @wordpress-plugin
   * Plugin Name: Easy UIkit
   * Plugin URI:  https://www.beaverplugins.com/docs/easy-uikit/
-  * Description: Easy UIKit adds the UIkit3 library (v 3.11.1) Flex classes are tweaked to work with Beaver Builder Columns. Also adds AlexVolsk uk-width-ex and uk-grid-ex for extra column support (12 columns)
-  * Version:     1.8.0
+  * Description: Easy UIKit adds the UIkit3 library (v3.15.9) Flex classes are tweaked to work with Beaver Builder Columns. Also adds AlexVolsk uk-width-ex and uk-grid-ex for extra column support (12 columns)
+  * Version:     1.0.0
   * Author:      Badabingbreda
   * Author URI:  https://www.badabing.nl
   * Text Domain: easy-uikit
@@ -19,54 +19,39 @@
   * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
   */
  
+use EasyUIkit\Autoloader;
+use EasyUIkit\Init;
 
-define( 'EASYUIKIT_VERSION' 	, '1.8.0' );
-define( 'EASYUIKIT_DIR'			, plugin_dir_path( __FILE__ ) );
-define( 'EASYUIKIT_FILE'		, __FILE__ );
-define( 'EASYUIKIT_URL' 		, plugins_url( '/', __FILE__ ) );
+if ( defined( 'ABSPATH' ) && ! defined( 'EASYUIKIT_VERION' ) ) {
+ register_activation_hook( __FILE__, 'EASYUIKIT_check_php_version' );
 
-add_action( 'wp_enqueue_scripts', 'easy_uikit_scripts_styles', 100, 1 );
+ /**
+  * Display notice for old PHP version.
+  */
+ function EASYUIKIT_check_php_version() {
+     if ( version_compare( phpversion(), '5.3', '<' ) ) {
+        die( esc_html__( 'Easy UIkit requires PHP version 5.3+. Please contact your host to upgrade.', 'mortgagebroker-calculator' ) );
+    }
+ }
 
-add_action( 'admin_enqueue_scripts', 'easy_uikit_admin_enqueue', 100, 1 );
+  define( 'EASYUIKIT_VERSION'   , '2.0.0' );
+  define( 'EASYUIKIT_DIR'     , plugin_dir_path( __FILE__ ) );
+  define( 'EASYUIKIT_FILE'    , __FILE__ );
+  define( 'EASYUIKIT_URL'     , plugins_url( '/', __FILE__ ) );
 
-/**
- * Enqueue script(s) and style(s)
- *
- */
-function easy_uikit_scripts_styles() {
-	wp_enqueue_script( 'easy-uikitjs', EASYUIKIT_URL . 'js/uikit.min.js', false, EASYUIKIT_VERSION , false );
-	wp_enqueue_script( 'easy-uikiticons', EASYUIKIT_URL . 'js/uikit-icons.min.js', false, EASYUIKIT_VERSION , false );
-	wp_enqueue_style( 'easy-uikitcss', EASYUIKIT_URL . 'css/bbuikit.theme.min.css', false, EASYUIKIT_VERSION , 'all' );
+  define( 'CHECK_EASYUIKIT_PLUGIN_FILE', __FILE__ );
+
 }
 
-/**
- * easy_uikit_admin_enqueue
- *
- * @return void
- */
-function easy_uikit_admin_enqueue() {
-	// bail early if constant has been set
-	// alternatively script can be removed from the queue
-	if (defined( 'EASYUIKIT_ADMIN_ENQUEUE' ) && EASUIKIT_ADMIN_ENQUEUE === false ) return;
-	easy_uikit_scripts_styles();
-}
+if ( ! class_exists( 'EasyUIkit\Init' ) ) {
 
-/**
- * Load the Github Updater
- */
-if( ! class_exists( 'github_updater' ) ){
-	include_once( EASYUIKIT_DIR . '/classes/class-github-updater.php' );
-}
+ /**
+  * The file where the Autoloader class is defined.
+  */
+  require_once 'inc/Autoloader.php';
+  spl_autoload_register( array( new Autoloader(), 'autoload' ) );
 
-$updater = new github_updater( EASYUIKIT_FILE );
-$updater->set_username( 'badabingbreda' );
-$updater->set_repository( 'easy-uikit' );
-$updater->set_settings( array(
-			'requires'			=> '5.1',
-			'tested'			=> '5.9.0',
-			'rating'			=> '100.0',
-			'num_ratings'		=> '10',
-			'downloaded'		=> '10',
-			'added'				=> '2019-04-06',
-		) );
-$updater->initialize();
+ $easyuikit = new Init();
+ // looking for the init hooks? Find them in the Check_Plugin_Dependencies.php->run() callback
+
+}
