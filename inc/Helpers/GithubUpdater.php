@@ -4,15 +4,13 @@ namespace EasyUIkit\Helpers;
  * Github updater
  *
  * @example Github release body:
- * 	Tested: 6.1.1
+ * 	Tested: 6.3
  *	Icons: 1x|https://domainname.com/icon-256x256.png?rev=2818463,2x|https://domainname.com/icon-256x256.png?rev=2818463
  *  Banners: 1x|https://domainname.com/banner-720x250.png
  *	RequiresPHP: 7.0
  *
  *	|||
- *	Updated to UIkit version 3.11.1
- * 
- * @since  1.1.1
+ *	Add your changes here
  *
  */
 class GithubUpdater {
@@ -64,11 +62,11 @@ class GithubUpdater {
 		// set some defaults in case someone forgets to set these
 		$defaults = array(
 			'requires'			=> '5.4',
-			'tested'			=> '6.1.1',
+			'tested'			=> '6.3',
 			'rating'			=> '100.0',
-			'num_ratings'		=> '10',
-			'downloaded'		=> '10',
-			'added'				=> '2019-04-06',
+			'num_ratings'			=> '10',
+			'downloaded'			=> '10',
+			'added'				=> '2023-08-20',
 			'banners'			=> false,
 		);
 
@@ -96,46 +94,101 @@ class GithubUpdater {
 
 	/**
 	 * [get_repository_info description]
-	 * @return [type] [description]
+	 * @return array Repository information or empty array on failure
 	 */
 	private function get_repository_info() {
+		// Do we have a response already cached?
+		if ( is_null( $this->github_response ) ) {
+			// Build URI
+			$request_uri = sprintf( 'https://api.github.com/repos/%s/%s/releases', $this->username, $this->repository );
 
-		// Do we have a response?
-	    if ( is_null( $this->github_response ) ) {
-	    	// Build URI
-	        $request_uri = sprintf( 'https://api.github.com/repos/%s/%s/releases', $this->username, $this->repository );
+			// Is there an access token?
+			if( $this->authorize_token ) {
+				// Append it
+				$request_uri = add_query_arg( 'access_token', $this->authorize_token, $request_uri );
+			}
 
-	        // Is there an access token?
-	        if( $this->authorize_token ) {
-	        	// Append it
-	            $request_uri = add_query_arg( 'access_token', $this->authorize_token, $request_uri );
-	        }
+			// Make the request to GitHub API
+			$request = wp_remote_get( $request_uri );
 
-	        // Get JSON and parse it
-	        $response = json_decode( wp_remote_retrieve_body( wp_remote_get( $request_uri ) ), true );
+			// Check if request was successful
+			if ( is_wp_error( $request ) ) {
+				// Handle error case
+				$this->github_response = array();
+				return $this->github_response;
+			}
 
-	        // If it is an array
-	        if( is_array( $response ) ) {
-	        	// Get the first item
-	            $response = current( $response );
-	        }
-	        // Is there an access token?
-	        if( $this->authorize_token ) {
-	        	// Update our zip url with token
-	            $response['zipball_url'] = add_query_arg( 'access_token', $this->authorize_token, $response['zipball_url'] );
-	        }
+			// Get response code
+			$response_code = wp_remote_retrieve_response_code( $request );
+			if ( $response_code !== 200 ) {
+				// API returned an error status code
+				$this->github_response = array();
+				return $this->github_response;
+			}
 
-			// try to get metadata from the release body
-			$metadata = $this->get_tmpfile_data( $response['body']);
+			// Get JSON and parse it
+			$response = json_decode( wp_remote_retrieve_body( $request ), true );
 
-			// merge the data with the response
-			$response = array_merge( $response, $metadata);
+			// Validate response is an array
+			if ( !is_array( $response ) || empty( $response ) ) {
+				$this->github_response = array();
+				return $this->github_response;
+			}
 
-	        // Set it to our property
-	        $this->github_response = $response;
-	        return $response;
-	    }
+			// Get the first item
+			$response = current( $response );
 
+			// Verify we have a proper release structure
+			if ( !is_array( $response ) ) {
+				$this->github_response = array();
+				return $this->github_response;
+			}
+
+			// Is there an access token and zipball URL?
+			if ( $this->authorize_token && isset( $response['zipball_url'] ) ) {
+				// Update our zip url with token
+				$response['zipball_url'] = add_query_arg( 'access_token', $this->authorize_token, $response['zipball_url'] );
+			}
+
+			// Check if body exists before trying to get metadata
+			if ( isset( $response['body'] ) && is_string( $response['body'] ) ) {
+				// Try to get metadata from the release body
+				$metadata = $this->get_tmpfile_data( $response['body'] );
+				
+				// Ensure metadata is an array
+				if ( is_array( $metadata ) ) {
+					// Merge the data with the response
+					$response = array_merge( $response, $metadata );
+				}
+			} else {
+				// If body doesn't exist, set empty defaults
+				$response['tested'] = '';
+				$response['requires_php'] = '';
+				$response['icons'] = array();
+				$response['banners'] = array();
+				$response['updates'] = '';
+			}
+
+			// Set it to our property
+			// Normalize required keys to avoid undefined index notices downstream
+			$defaults = array(
+				'tag_name'      => '',
+				'zipball_url'   => '',
+				'published_at'  => '',
+				'tested'        => '',
+				'requires_php'  => '',
+				'icons'         => array(),
+				'banners'       => array(),
+				'updates'       => '',
+			);
+			$response = array_merge( $defaults, $response );
+
+			$this->github_response = $response;
+			return $response;
+		}
+
+		// Return cached response
+		return $this->github_response;
 	}
 
 	/**
@@ -167,27 +220,47 @@ class GithubUpdater {
 				// Get the repo info
 				$this->get_repository_info();
 
+				// If we failed to fetch repository info, bail early
+				if ( empty( $this->github_response ) || !is_array( $this->github_response ) ) {
+					return $transient;
+				}
+
+				// Determine the latest version string safely
+				$latest_version = $this->github_response['tag_name'] ?? ( $this->github_response['name'] ?? '' );
+				if ( $latest_version === null || $latest_version === '' ) {
+					return $transient;
+				}
+				$latest_version = (string) $latest_version;
+
+				// Determine current installed version safely
+				$current_version = $checked[ $this->basename ] ?? '';
+				$current_version = (string) $current_version;
+
 				// Check if we're out of date
-				$out_of_date = version_compare( $this->github_response['tag_name'], $checked[ $this->basename ], 'gt' );
+				$out_of_date = version_compare( $latest_version, $current_version, 'gt' );
 				if( $out_of_date ) {
 
 					// Get the ZIP
 					$new_files = $this->github_response['zipball_url'];
 
-					// Create valid slug
-					$slug = current( explode('/', $this->basename ) );
+					// Create valid slug (ensure basename is a string)
+					$basename_str = isset($this->basename) ? (string) $this->basename : '';
+					if ($basename_str === '') {
+						return $transient;
+					}
+					$slug = current( explode('/', $basename_str ) );
 
 					// setup our plugin info
 					$plugin = array(
 						'url' => $this->plugin["PluginURI"],
 						'slug' => $slug,
 						'package' => $new_files,
-						'tested' => $this->github_response['tested'],
-						'icons' => $this->github_response['icons'],
-						'banners' => $this->github_response['banners'],
+						'tested' => $this->github_response['tested'] ?? '',
+						'icons' => $this->github_response['icons'] ?? array(),
+						'banners' => $this->github_response['banners'] ?? array(),
 						'banners_rtl' => [],
-						'requires_php' => $this->github_response['requires_php'],
-						'new_version' => $this->github_response['tag_name'],
+						'requires_php' => $this->github_response['requires_php'] ?? '',
+						'new_version' => $latest_version,
 					);
 
 					// Return it in response
@@ -211,7 +284,16 @@ class GithubUpdater {
 	 */
 	private function get_tmpfile_data( $string ) {
 
-		$temp = tmpfile();
+
+		// create a wp temp file in the 
+		$temp_file = wp_tempnam();
+		$temp = fopen($temp_file, 'r+');
+		
+		// make sure to also delete the file when done or even when scripts fail
+		register_shutdown_function( function() use( $temp_file ) {
+			@unlink( $temp_file );
+		} );		
+
 		$tmpfilename = stream_get_meta_data($temp)['uri'];
 		fwrite( $temp, $string);
 
@@ -262,8 +344,8 @@ class GithubUpdater {
 			'updates' => $updates,
         ];
 
-		// close our temp file again
-		fclose($temp);
+		// the register_shutdown function will also make sure the temp-file
+		// gets deleted whenever something fails
 
         return $data;
 
@@ -285,26 +367,32 @@ class GithubUpdater {
 		if( ! empty( $args->slug ) ) {
 
 			// And it's our slug
-			if( $args->slug == current( explode( '/' , $this->basename ) ) ) {
+			$basename_str = isset($this->basename) ? (string) $this->basename : '';
+			if ($basename_str === '') {
+				return $result;
+			}
+			$our_slug = current( explode( '/' , $basename_str ) );
+			if( $args->slug == $our_slug ) {
 
 				// Get our repo info
 				$this->get_repository_info();
 				// Set it to an array
+				$latest_version = $this->github_response['tag_name'] ?? ( $this->github_response['name'] ?? '' );
 				$plugin = array(
-					'name'				=> $this->plugin["Name"],
-					'slug'				=> $this->basename,
-					'version'			=> $this->github_response['tag_name'],
-					'author'			=> $this->plugin["AuthorName"],
-					'author_profile'	=> $this->plugin["AuthorURI"],
-					'last_updated'		=> $this->github_response['published_at'],
-					'homepage'			=> $this->plugin["PluginURI"],
+					'name'              => $this->plugin["Name"],
+					'slug'              => $this->basename,
+					'version'           => $latest_version,
+					'author'            => $this->plugin["AuthorName"],
+					'author_profile'    => $this->plugin["AuthorURI"],
+					'last_updated'      => $this->github_response['published_at'] ?? '',
+					'homepage'          => $this->plugin["PluginURI"],
 					'short_description' => $this->plugin["Description"],
-					'sections'			=> array(
-						'Description'	=> $this->plugin["Description"],
-						'Updates'		=> $this->github_response['updates'],
+					'sections'          => array(
+						'Description'   => $this->plugin["Description"],
+						'Updates'       => $this->github_response['updates'] ?? '',
 					),
-					'banners'			=> $this->github_response[ 'banners' ],
-					'download_link'		=> $this->github_response['zipball_url']
+					'banners'           => $this->github_response['banners'] ?? array(),
+					'download_link'     => $this->github_response['zipball_url'] ?? ''
 				);
 
 				// merge with other settings that can be set

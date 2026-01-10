@@ -53,16 +53,22 @@ Row background shapes (SVG's) and Row Shape Effects (UABB addon) have been impro
 
 ---
 ## Current UIkit version
-Current version is v3.15.24 ( released Feb 8th, 2023 )
+Current version is v3.23.11 ( released Jun 25th, 2025 )
 
 ---
 
 ## CHANGELOG
 
+**v.2.0.3**
+Update to UIkit 3.23.11
+Update github updater class for enhanced errors handling
+
 **v.2.0.2**
 Updated to UIkit 3.15.24.
+
 **v.2.0.1**
 Fixed release info
+
 **v.2.0.0**
 Updated to UIkit 3.15.19.
 Updated plugin to autoloader
